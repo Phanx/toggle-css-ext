@@ -1,0 +1,38 @@
+{
+	"name": "Toggle CSS",
+	"description" : "Quickly enable or disable CSS in the current tab",
+	"version": "0.1",
+	"manifest_version": 2,
+	"permissions": ["tabs", "<all_urls>"],
+	"background": {
+		"scripts": ["background.js"]
+	},
+	"content_scripts": [
+		{
+			"all_frames": true,
+			"js": ["content.js"],
+			"matches": ["<all_urls>"]
+		}
+	],
+	"commands": {
+		"_execute_browser_action": {
+			"description": "Toggle CSS",
+			"suggested_key": {
+				"default": "Ctrl+G"
+			}
+		}
+	},
+	"browser_action": {
+		"default_title": "Disable CSS",
+		"default_icon": {
+			"19": "icons/action19.png",
+			"38": "icons/action38.png"
+		}
+	},
+	"icons": {
+		"16": "icons/icon16.png",
+		"32": "icons/icon32.png",
+		"48": "icons/icon48.png",
+		"128": "icons/icon128.png"
+	}
+}
