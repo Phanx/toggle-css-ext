@@ -4,8 +4,8 @@
 // Last updated: 2018-03-29
 // This is free and unencumbered software released into the public domain.
 
-let disabled = false
-let observer
+let cssDisabled = false
+let observer = null
 
 const t = (arg) => Array.prototype.slice.call(arg)
 const $ = (sel) => t(document.querySelectorAll(sel))
@@ -51,8 +51,8 @@ const observerCallback = (mutations) => {
 }
 
 const disableCSS = () => {
-	if (disabled) return // already disabled
-	disabled = true
+	if (cssDisabled) return // already disabled
+	cssDisabled = true
 
 	t(document.styleSheets).forEach(sheet => {
 		sheet.disabled = true
@@ -64,8 +64,8 @@ const disableCSS = () => {
 }
 
 const enableCSS = () => {
-	if (!disabled) return // already enabled
-	disabled = false
+	if (!cssDisabled) return // already enabled
+	cssDisabled = false
 
 	stopObserver()
 
@@ -76,19 +76,33 @@ const enableCSS = () => {
 	$("[data-removed-css]").forEach(el => restoreInlineCSS)
 }
 
-chrome.runtime.onMessage.addListener((message, sender, callback) => {
-	// console.log("page received message:", message)
+const onMessage = (message, sender, callback) => {
+	console.log("page received message:", message)
 	const { action, tabId } = message
-	if (action === "toggle") {
-		if (disabled) {
-			enableCSS()
-		} else {
-			disableCSS()
-		}
 
-		const state = disabled ? "disabled" : "enabled"
-		const reply = { state, tabId }
-		// console.log("page sending message:", reply)
-		callback(reply)
+	if (action === "ping") {
+		console.log("page sending message:", { message: "ack" })
+		callback({ message: "ack" })
+		return
 	}
-})
+
+	if (action !== "toggle") return
+
+	if (cssDisabled) {
+		enableCSS()
+	} else {
+		disableCSS()
+	}
+
+	const state = cssDisabled ? "disabled" : "enabled"
+	console.log("page sending message:", { state, tabId })
+	callback({ state, tabId })
+}
+
+const init = (report) => {
+	console.log("script injection complete")
+	chrome.runtime.onMessage.addListener(onMessage)
+	return report
+}
+
+init("loaded")

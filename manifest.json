@@ -3,17 +3,10 @@
 	"description" : "Quickly enable or disable CSS in the current tab",
 	"version": "0.1",
 	"manifest_version": 2,
-	"permissions": ["tabs", "<all_urls>"],
+	"permissions": ["activeTab"],
 	"background": {
 		"scripts": ["background.js"]
 	},
-	"content_scripts": [
-		{
-			"all_frames": true,
-			"js": ["content.js"],
-			"matches": ["<all_urls>"]
-		}
-	],
 	"commands": {
 		"_execute_browser_action": {
 			"description": "Toggle CSS",
